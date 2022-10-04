@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}
+    Shows
+{% endblock %}
+{% block content %}
+
+<div class="container">
+    {% if posts is defined %}
+    {% for post in posts %}
+    <br>
+    <div class="row">
+        <div class="col">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <strong>
+                            {{post.title}}
+                        </strong>
+                        {% if post.current_episode == post.episodes %}
+                        <span class="badge bg-success">Completed</span>
+                        {% else %}
+                        <span class="badge bg-warning">In Progress</span>
+                        {% endif %}
+
+                    </h5>
+                    <p class="card-text">
+                        You've watched {{post.current_episode}} out of {{post.episodes}} episodes.
+                        <div class="progress">
+                            <div class="progress-bar" role="progressbar" aria-label="Basic example" style="width: {{((post.current_episode | int / post.episodes | int ) * 100) | round(2)}}%" aria-valuemin="0" aria-valuemax="100">
+                            </div>
+                        </div>
+                    </p>
+                    <form action="/update/{{post.id}}" method="POST" class="input-group mb-3">
+                        <input type="number" name="current_episode" pattern="[0-9]" class="form-control" placeholder="Current Episode" required min="1" max="1000" aria-label="Current Episode" aria-describedby="button-addon2">
+                        <button class="btn btn-outline-secondary" type="submit" id="button-addon2">Update</button>
+                    </form>
+                    {% if post.current_episode == post.episodes %}
+                    <form action="/delete/{{post.id}}" method="post">
+                        <input type="submit" class="btn btn-danger" value="Delete" />
+                    </form>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+    {% endif %}
+</div>
+
+{% endblock %}

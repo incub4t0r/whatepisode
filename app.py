@@ -7,6 +7,10 @@ DATABASE = os.path.join(ROOT, 'database.db')
 
 app = Flask(__name__)
 
+#####################
+# databse functions #
+#####################
+
 # access sqlite3 database
 def db_connect():
     conn = sqlite3.connect(DATABASE)
@@ -47,10 +51,17 @@ def db_delete(id):
     conn.commit()
     conn.close()
 
-# update data from database
-def db_update(id, title, episodes):
+# update number of episodes from database
+def db_update_episodes(id, episodes):
     conn = db_connect()
-    conn.execute('UPDATE posts SET title = ?, episodes = ? WHERE id = ?', (title, episodes, id))
+    conn.execute('UPDATE posts SET episodes = ? WHERE id = ?', (episodes, id))
+    conn.commit()
+    conn.close()
+
+# update title from database
+def db_update_title(id, title):
+    conn = db_connect()
+    conn.execute('UPDATE posts SET title = ? WHERE id = ?', (title, id))
     conn.commit()
     conn.close()
 
@@ -61,19 +72,43 @@ def db_update_current_episode(id, current_episode):
     conn.commit()
     conn.close()
 
+# get number of episodes from databse
+def db_get_episodes(id):
+    conn = db_connect()
+    cur = conn.execute('SELECT episodes FROM posts WHERE id = ?', (id,))
+    episodes = cur.fetchone()
+    conn.close()
+    return episodes
 
+# get current_episode from databse
+def db_get_current_episode(id):
+    conn = db_connect()
+    cur = conn.execute('SELECT current_episode FROM posts WHERE id = ?', (id,))
+    current_episode = cur.fetchone()
+    conn.close()
+    return current_episode
+
+#####################
+# Main page         #
+#####################
+
+# home page
 @app.route('/')
-def index():
-    return render_template('index.html')
-
-# show all posts through a post
-@app.route('/shows', methods=['GET', 'POST'])
-def shows():
-    # if request.method == 'POST':
+def home():
     posts = db_select()
-    return render_template('shows.html', posts=posts)
-    # return render_template('shows.html')
+    return render_template('home.html', posts=posts)
 
+@app.route('/manager', methods=['GET', 'POST'])
+def manager():
+    posts = db_select()
+    return render_template('manager.html', posts=posts)
+
+
+#####################
+# API endpoints     #
+#####################
+
+# add a new post
 @app.route("/add", methods=['GET', 'POST'])
 def add():
     if request.method == 'POST':
@@ -81,23 +116,68 @@ def add():
         episodes = request.form['episodes']
         current_episode = request.form['current_episode']
         db_insert(title, episodes, current_episode)
-        return redirect(url_for('shows'))
+        return redirect(url_for('home'))
     return render_template('add.html')
 
+# delete a post
 @app.route('/delete/<int:id>', methods=['GET', 'POST'])
 def delete(id):
     if request.method == 'POST':
         db_delete(id)
-        return redirect(url_for('shows'))
-    return render_template('delete.html')
+    return redirect(url_for('manager'))
 
-@app.route('/update/<int:id>', methods=['GET', 'POST'])
-def update(id):
-    # if request.method == 'POST':
-    current_episode = request.form['current_episode']
-    db_update_current_episode(id, current_episode)
-    return redirect(url_for('shows'))
+# update a post's current_episode
+@app.route('/update/current_episode/<int:id>', methods=['GET', 'POST'])
+def update_current_episode(id):
+    if request.method == 'POST':
+        total_episodes = db_get_episodes(id)[0]
+        current_episode = request.form['current_episode']
+        if (int(current_episode) <= int(total_episodes)):
+            db_update_current_episode(id, current_episode)
+    return redirect(url_for('home'))
     # return render_template('update.html')
+
+# update a post's current_episode
+@app.route('/update/current_episode/increment/<int:id>', methods=['GET', 'POST'])
+def increment_curr_episode(id):
+    if request.method == 'POST':
+        total_episodes = int(db_get_episodes(id)[0])
+        current_episode = int(db_get_current_episode(id)[0])
+        if (current_episode < total_episodes):
+            db_update_current_episode(id, str(current_episode+1))
+    return redirect(url_for('home'))
+
+# update a post's current_episode
+@app.route('/update/current_episode/decrement/<int:id>', methods=['GET', 'POST'])
+def decrement_curr_episode(id):
+    if request.method == 'POST':
+        current_episode = int(db_get_current_episode(id)[0])
+        if (int(current_episode) > 0):
+            db_update_current_episode(id, str(current_episode-1))
+    return redirect(url_for('home'))
+
+
+# update a post's total number of episodes
+@app.route('/update/episodes/<int:id>', methods=['GET', 'POST'])
+def update_episodes(id):
+    if request.method == 'POST':
+        episodes = request.form['episodes']
+        db_update_episodes(id, episodes)
+        # total_episodes = db_get_episodes(id)[0]
+        # current_episode = request.form['current_episode']
+        # if (int(current_episode) <= int(total_episodes)):
+        #     db_update_current_episode(id, current_episode)
+        return redirect(url_for('manager'))
+    return redirect(url_for('home'))
+
+# update a post's title
+@app.route('/update/title/<int:id>', methods=['GET', 'POST'])
+def update_title(id):
+    if request.method == 'POST':
+        title = request.form['title']
+        db_update_title(id, title)
+        return redirect(url_for('manager'))
+    return redirect(url_for('home'))
 
 if __name__ == '__main__':
     db_check()

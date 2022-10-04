@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% block title %}
+    Manager
+{% endblock %}
+{% block content %}
+
+<!-- create an input to add a new tv show with the number of episodes -->
+<br>
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <h1 >
+                <strong>
+                    Add a new TV show
+                </strong>
+            </h1>
+            <div class="card">
+                <div class="card-body">
+                    
+                    <form action="/add" method="POST">
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="title" name="title" placeholder="Enter TV Show" required>
+                            <label for="title">Name of TV show</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="number" class="form-control" id="episodes" name="episodes" placeholder="Enter Number of Episodes" required>
+                            <label for="episodes">Number of episodes</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="number" class="form-control" id="current_episode" name="current_episode" placeholder="Enter Number of Episodes" required>
+                            <label for="current_episode">Current episode</label>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<br>
+<div class="container">
+    <h1 >
+        <strong>
+            Manage shows
+        </strong>
+    </h1>
+    {% if posts is defined %}
+    {% for post in posts %}
+    <div class="row">
+        <div class="col">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <strong>
+                            {{post.title}}
+                        </strong>
+                        {% if post.current_episode == post.episodes %}
+                        <span class="badge bg-success ms-2">Completed</span>
+                        {% else %}
+                        <span class="badge bg-warning ms-2">In Progress</span>
+                        {% endif %}
+                    </h5>
+                    <p class="card-text">
+                        You've watched {{post.current_episode}} out of {{post.episodes}} episodes.
+                        <div class="progress">
+                            <div class="progress-bar" role="progressbar" aria-label="Basic example" style="width: {{((post.current_episode | int / post.episodes | int ) * 100) | round(2)}}%" aria-valuemin="0" aria-valuemax="100">
+                            </div>
+                        </div>
+                    </p>
+                    <form action="/update/title/{{post.id}}" method="POST" class="input-group mb-3">
+                        <input type="text" name="title" class="form-control" placeholder="Title" required aria-label="Title" aria-describedby="button-addon1">
+                        <button class="btn btn-outline-secondary" type="submit" id="button-addon1">Update</button>
+                    </form>
+                    <form action="/update/episodes/{{post.id}}" method="POST" class="input-group mb-3">
+                        <input type="number" name="episodes" pattern="[0-9]" class="form-control" placeholder="Number of episodes" required min="1" max="1000" aria-label="Number of episodes" aria-describedby="button-addon2">
+                        <button class="btn btn-outline-secondary" type="submit" id="button-addon2">Update</button>
+                    </form>
+                    <form action="/update/current_episode/{{post.id}}" method="POST" class="input-group mb-3">
+                        <input type="number" name="current_episode" pattern="[0-9]" class="form-control" placeholder="Current Episode" required min="1" max="1000" aria-label="Current Episode" aria-describedby="button-addon3">
+                        <button class="btn btn-outline-secondary" type="submit" id="button-addon3">Update</button>
+                    </form>
+                    <form action="/delete/{{post.id}}" method="post">
+                        <input type="submit" class="btn btn-danger" value="Delete" />
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <br>
+    {% endfor %}
+    {% endif %}
+</div>
+
+{% endblock %}
