@@ -9,6 +9,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-OERcA2EqjJCMA+/3y+gxIOqMEjwtxJY7qPCqsdltbNJuaOe923+mo//f6V8Qbsw3" crossorigin="anonymous"></script>
 </head>
 
+<!-- https://www.codeply.com/go/4FdZGlPMNV -->
 <style>
     /* Chrome, Safari, Edge, Opera */
     input::-webkit-outer-spin-button,
@@ -21,11 +22,94 @@
     input[type=number] {
         -moz-appearance: textfield;
     }
+
+    :root {
+        --color-bg: #121212;
+        --color-primary: #1c1c1f;
+        --color-secondary: #010101;
+        --color-text-primary: whitesmoke;
+        --color-text-secondary: lightgray;
+        --shadow: 0px 0px 10px 3px rgba(0,0,0,0.5);
+        --color-toggler-icon: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba(245,245,245, 1)' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 8h24M4 16h24M4 24h24'/%3E%3C/svg%3E");
+        /* --detail-push-chevron: url("data:image/svg+xml;charset=utf-8,<svg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2012%2020'><path%20d='M2,20l-2-2l8-8L0,2l2-2l10,10L2,20z'%20fill='%23ff0000'/></svg>"); */
+    }
+
+    @media (prefers-color-scheme: light) {
+        :root {
+            --color-bg: #ffffff;
+            --color-primary: #ffffff;
+            --color-secondary: #ffffff;
+            --color-text-primary: #010101;
+            --color-text-secondary: lightgray;
+            --shadow: 0px 0px 10px 6px rgba(100,100,100,0.1);
+            /* https://stackoverflow.com/questions/24080462/how-to-change-bootstrap-toggle-navigation-color */
+            --color-toggler-icon: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba(10,10,10, 1)' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 8h24M4 16h24M4 24h24'/%3E%3C/svg%3E");
+        }
+    }
+
+    * {
+        color: var(--color-text-primary);
+    }
+
+    .custom-nav {
+        background-color: var(--color-primary);
+        -webkit-box-shadow: var(--shadow); 
+        box-shadow: var(--shadow);
+    }
+
+    .custom-nav * {
+        color: var(--color-text-primary);
+    }
+
+    .custom-nav .nav-link:hover{
+        color: var(--color-text-secondary);
+    }
+
+    .custom-nav .custom-toggler{
+        border-color: var(--color-text-primary);
+        color: var(--color-text-primary);
+    }
+
+    .custom-nav .navbar-toggler-icon{
+        background-image: var(--color-toggler-icon);
+    }
+    
+    .custom-card{
+        background-color: var(--color-primary);
+        -webkit-box-shadow: var(--shadow); 
+        box-shadow: var(--shadow); 
+    }
+
+    .custom-card input{
+        background-color: var(--color-secondary);
+        color: var(--color-text-primary);
+    }
+    
+    .custom-card .btn-group {
+        width: 100%;
+    }
+    
+    .custom-card .btn-group .btn {
+        width: 50%;
+    }
+
+    .custom-card .btn-group .btn{
+        background-color: var(--color-secondary);
+    }
+
+    .custom-bg {
+        background-color: var(--color-bg) ;
+    }
+
+    .input-group * {
+        background-color: var(--color-secondary);
+    }
 </style>
 
 {% include 'nav.html' %}
-<body>
+<body class="custom-bg">
     {% block content %}
     {% endblock %}
 </body>
+<br>
 </html>
