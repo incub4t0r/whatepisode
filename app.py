@@ -115,8 +115,9 @@ def add():
         title = request.form['title']
         episodes = request.form['episodes']
         current_episode = request.form['current_episode']
-        db_insert(title, episodes, current_episode)
-        return redirect(url_for('home'))
+        if current_episode <= episodes:
+            db_insert(title, episodes, current_episode)
+        return redirect(url_for('manager'))
     return render_template('add.html')
 
 # delete a post
@@ -134,7 +135,7 @@ def update_current_episode(id):
         current_episode = request.form['current_episode']
         if (int(current_episode) <= int(total_episodes)):
             db_update_current_episode(id, current_episode)
-    return redirect(url_for('home'))
+    return redirect(url_for('manager'))
     # return render_template('update.html')
 
 # update a post's current_episode
@@ -163,10 +164,6 @@ def update_episodes(id):
     if request.method == 'POST':
         episodes = request.form['episodes']
         db_update_episodes(id, episodes)
-        # total_episodes = db_get_episodes(id)[0]
-        # current_episode = request.form['current_episode']
-        # if (int(current_episode) <= int(total_episodes)):
-        #     db_update_current_episode(id, current_episode)
         return redirect(url_for('manager'))
     return redirect(url_for('home'))
 
@@ -178,6 +175,11 @@ def update_title(id):
         db_update_title(id, title)
         return redirect(url_for('manager'))
     return redirect(url_for('home'))
+
+# provide an about page
+@app.route('/about')
+def about():
+    return render_template('about.html')
 
 if __name__ == '__main__':
     db_check()
